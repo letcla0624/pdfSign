@@ -225,27 +225,27 @@
   const saveBtn = document.querySelector(".save");
   const showImage = document.querySelector(".show-img");
 
-  if (window.innerWidth >= 576) {
-    signCanvas.setAttribute('width', 466);
-    signCanvas.setAttribute('height', 234);
-    pen();
-  } else {
-    signCanvas.setAttribute('width', 'auto');
-    signCanvas.setAttribute('height', 150);
-    pen();
-  }
+  // if (window.innerWidth >= 576) {
+  //   signCanvas.setAttribute('width', 466);
+  //   signCanvas.setAttribute('height', 234);
+  //   pen();
+  // } else {
+  //   signCanvas.setAttribute('width', 'auto');
+  //   signCanvas.setAttribute('height', 150);
+  //   pen();
+  // }
 
-  window.addEventListener("resize", function () {
-    if (window.innerWidth >= 576) {
-      signCanvas.setAttribute('width', 466);
-      signCanvas.setAttribute('height', 234);
-      pen();
-    } else {
-      signCanvas.setAttribute('width', 'auto');
-      signCanvas.setAttribute('height', 150);
-      pen();
-    }
-  });
+  // window.addEventListener("resize", function () {
+  //   if (window.innerWidth >= 576) {
+  //     signCanvas.setAttribute('width', 466);
+  //     signCanvas.setAttribute('height', 234);
+  //     pen();
+  //   } else {
+  //     signCanvas.setAttribute('width', 'auto');
+  //     signCanvas.setAttribute('height', 150);
+  //     pen();
+  //   }
+  // });
 
   // 簽名變換顏色
   const colorBlock = document.querySelectorAll('.colorBlock .stepCircle');
