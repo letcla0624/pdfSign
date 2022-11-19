@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>
-    <%- title %>
+    點點簽 - 檔案下載
   </title>
   <link rel="shortcut icon" href="./assets/images/favicon.ico" type="image/x-icon">
   <link
@@ -43,7 +43,51 @@
     </nav>
   </header>
 
-  <%- contents %>
+  
+<section class="bg-default-light border border-bottom">
+  <div class="container">
+    <div class="d-flex justify-content-center">
+      <div class="w-100 w-lg-75 timeline">
+        <ul class="list-unstyled row row-cols-3 g-0 mb-0 py-4">
+          <li class="d-flex justify-content-center align-items-center">
+            <div
+              class="text-white stepCircle bg-default d-flex justify-content-center align-items-center border border-2 border-default rounded-circle">
+              <span class="material-icons-outlined fw-bold fs-7 fs-lg-6">done</span>
+            </div>
+            <p class="ms-2 mx-lg-3 fs-8 fs-lg-6">成功上傳檔案</p>
+          </li>
+          <li class="d-flex justify-content-center align-items-center">
+            <div
+              class="text-white stepCircle bg-default d-flex justify-content-center align-items-center border border-2 border-default rounded-circle">
+              <span class="material-icons-outlined fw-bold fs-7 fs-lg-6">done</span>
+            </div>
+            <p class="ms-2 mx-lg-3 fs-8 fs-lg-6">加入簽名檔</p>
+          </li>
+          <li class="d-flex justify-content-center align-items-center">
+            <div
+              class="text-white stepCircle active bg-default d-flex justify-content-center align-items-center border border-2 border-default rounded-circle">
+              <span class="material-icons-outlined fw-bold fs-7 fs-lg-6">done</span>
+            </div>
+            <p class="ms-2 mx-lg-3 fs-8 fs-lg-6">下載檔案</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="container auto-h d-flex justify-content-center align-items-center">
+  <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center">
+    <img src="./assets/images/human/finished.svg" alt="finished" class="w-50 mb-3">
+    <div class="d-flex flex-column justify-content-between">
+      <div class="mb-5 mb-lg-6">
+        <h1 class="h4 text-default fw-bold">恭喜您完成簽署，檔案下載中...</h1>
+        <p class="fs-7">您的檔案已下載。</p>
+      </div>
+      <a href="./index.html" class="btn btn-default w-100 py-2d5">完成</a>
+      <a href="./pdf.html" class="btn text-default w-100 py-2d5 mt-2">上一步</a>
+    </div>
+  </div>
+</div>
 
     <div class="modal fade messageModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
