@@ -79,10 +79,10 @@
   <div class="d-flex flex-column flex-lg-row gap-3 mb-8">
     <div class="col-lg-8">
       <div class="content w-100 bg-secondary-light d-flex justify-content-center align-items-center">
-        <canvas id="canvas" class="w-100 h-100 object-content"></canvas>
+        <canvas id="pdfCanvas" class="w-100 h-100 object-content"></canvas>
       </div>
       <button type="button"
-        class="btn btn-outline-default w-100 py-2d5 d-flex justify-content-center align-items-center fw-bold resetSignBtn">
+        class="btn btn-outline-default w-100 py-2d5 d-flex justify-content-center align-items-center fw-bold mb-3 mb-lg-0 resetSignBtn">
         <span class="material-icons-outlined">delete</span>
         刪除文件上選取的簽名
       </button>
@@ -96,7 +96,7 @@
             <span class="material-icons-outlined">add</span>
             創建簽名檔
           </button>
-          <div class="mySign">
+          <div class="mySign d-none">
             <div>
               <strong class="">我的簽名</strong>
             </div>
@@ -155,8 +155,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js"></script>
 <script>
   // 此處 canvas 套用 fabric.js
-  const canvas = new fabric.Canvas("canvas");
-  const content = document.querySelector('.content');
+  const canvas = new fabric.Canvas("pdfCanvas");
+  const Base64Prefix = "data:application/pdf;base64,";
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://mozilla.github.io/pdf.js/build/pdf.worker.js";
 
   document.addEventListener('DOMContentLoaded', async () => {
     const recentPDFDataURL = localStorage.getItem('recentPDF');
@@ -175,10 +177,7 @@
     }
   })
 
-  const Base64Prefix = "data:application/pdf;base64,";
 
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "https://mozilla.github.io/pdf.js/build/pdf.worker.js";
 
   async function printPDF(pdfData) {
     // 將 base64 中的前綴刪去，並進行解碼
@@ -249,7 +248,6 @@
 
   // 簽名變換顏色
   const colorBlock = document.querySelectorAll('.colorBlock .stepCircle');
-
   colorBlock.forEach(item => {
     item.addEventListener('click', (e) => {
       const arr = [...e.target.parentNode.children];
@@ -403,13 +401,16 @@
   const mySign = document.querySelector('.mySign');
   const emptyImg = `data:image/png;base64,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`;
 
+  const mobileEmptyImg = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAAAXNSR0IArs4c6QAABGJJREFUeF7t1AEJAAAMAsHZv/RyPNwSyDncOQIECEQEFskpJgECBM5geQICBDICBitTlaAECBgsP0CAQEbAYGWqEpQAAYPlBwgQyAgYrExVghIgYLD8AAECGQGDlalKUAIEDJYfIEAgI2CwMlUJSoCAwfIDBAhkBAxWpipBCRAwWH6AAIGMgMHKVCUoAQIGyw8QIJARMFiZqgQlQMBg+QECBDICBitTlaAECBgsP0CAQEbAYGWqEpQAAYPlBwgQyAgYrExVghIgYLD8AAECGQGDlalKUAIEDJYfIEAgI2CwMlUJSoCAwfIDBAhkBAxWpipBCRAwWH6AAIGMgMHKVCUoAQIGyw8QIJARMFiZqgQlQMBg+QECBDICBitTlaAECBgsP0CAQEbAYGWqEpQAAYPlBwgQyAgYrExVghIgYLD8AAECGQGDlalKUAIEDJYfIEAgI2CwMlUJSoCAwfIDBAhkBAxWpipBCRAwWH6AAIGMgMHKVCUoAQIGyw8QIJARMFiZqgQlQMBg+QECBDICBitTlaAECBgsP0CAQEbAYGWqEpQAAYPlBwgQyAgYrExVghIgYLD8AAECGQGDlalKUAIEDJYfIEAgI2CwMlUJSoCAwfIDBAhkBAxWpipBCRAwWH6AAIGMgMHKVCUoAQIGyw8QIJARMFiZqgQlQMBg+QECBDICBitTlaAECBgsP0CAQEbAYGWqEpQAAYPlBwgQyAgYrExVghIgYLD8AAECGQGDlalKUAIEDJYfIEAgI2CwMlUJSoCAwfIDBAhkBAxWpipBCRAwWH6AAIGMgMHKVCUoAQIGyw8QIJARMFiZqgQlQMBg+QECBDICBitTlaAECBgsP0CAQEbAYGWqEpQAAYPlBwgQyAgYrExVghIgYLD8AAECGQGDlalKUAIEDJYfIEAgI2CwMlUJSoCAwfIDBAhkBAxWpipBCRAwWH6AAIGMgMHKVCUoAQIGyw8QIJARMFiZqgQlQMBg+QECBDICBitTlaAECBgsP0CAQEbAYGWqEpQAAYPlBwgQyAgYrExVghIgYLD8AAECGQGDlalKUAIEDJYfIEAgI2CwMlUJSoCAwfIDBAhkBAxWpipBCRAwWH6AAIGMgMHKVCUoAQIGyw8QIJARMFiZqgQlQMBg+QECBDICBitTlaAECBgsP0CAQEbAYGWqEpQAAYPlBwgQyAgYrExVghIgYLD8AAECGQGDlalKUAIEDJYfIEAgI2CwMlUJSoCAwfIDBAhkBAxWpipBCRAwWH6AAIGMgMHKVCUoAQIGyw8QIJARMFiZqgQlQMBg+QECBDICBitTlaAECBgsP0CAQEbAYGWqEpQAAYPlBwgQyAgYrExVghIgYLD8AAECGQGDlalKUAIEDJYfIEAgI2CwMlUJSoCAwfIDBAhkBAxWpipBCRAwWH6AAIGMgMHKVCUoAQIGyw8QIJARMFiZqgQlQMBg+QECBDICBitTlaAECBgsP0CAQEbAYGWqEpQAgQdWMQCX4yW9owAAAABJRU5ErkJggg==`;
+
   function hasSign() {
-    if (showImg.getAttribute('src') === '' || !showImg.hasAttribute('src') || showImage.getAttribute('src') === emptyImg) {
+    if (showImg.getAttribute('src') === '' || !showImg.hasAttribute('src') || showImage.getAttribute('src') === emptyImg || showImage.getAttribute('src') === mobileEmptyImg) {
       addSignBtn.innerHTML = `<span class="material-icons-outlined">add</span>創建簽名檔`;
       addSignBtn.classList.add('btn-default');
       addSignBtn.classList.remove('btn-outline-default');
       mySign.classList.add('d-none');
       download.classList.add('disabled');
+      localStorage.removeItem("img");
     } else {
       addSignBtn.innerHTML = `<span class="material-icons-outlined">edit</span>編輯簽名檔`;
       addSignBtn.classList.remove('btn-default');
