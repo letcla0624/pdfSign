@@ -21630,6 +21630,7 @@ progress {
   height: 40px;
   border-radius: 50%;
   overflow: hidden;
+  -webkit-appearance: none;
   outline: 2px solid #0b7d77;
 }
 
@@ -21637,6 +21638,7 @@ progress {
   .stepCircle.active:after {
     width: 28px;
     height: 28px;
+    border-radius: 50px;
   }
 }
 
