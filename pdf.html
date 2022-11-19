@@ -113,9 +113,9 @@
       </div>
     </div>
   </div>
-  <canvas id="signCanvas" class="border border-dark border-dashed rounded" width="500" height="300"></canvas>
+  <canvas id="signCanvas" width="500" height="300" style="border: 1px solid #000"></canvas>
+  <button class="clear">Clear</button>
 </section>
-
 
 <!-- Sign Modal -->
 <div class="modal fade" id="signModal" tabindex="-1" aria-labelledby="signModalLabel" aria-hidden="true">
@@ -126,7 +126,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body text-center">
-        <!-- <canvas id="signCanvas" class="border border-dark border-dashed rounded" width="500" height="300"></canvas> -->
+        <!-- <canvas id="signCanvas" class="border border-dark border-dashed rounded"></canvas> -->
         <ul class="list-unstyled d-flex justify-content-end mt-3 colorBlock">
           <li class="stepCircle active rounded-circle d-flex justify-content-center align-items-center mx-2 bg-dark"
             data-color="black">
@@ -150,7 +150,7 @@
   </div>
 </div>
 
-<script src="https://unpkg.com/fabric@latest/dist/fabric.js"></script>
+<!-- <script src="https://unpkg.com/fabric@latest/dist/fabric.js"></script>
 <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js"></script>
 <script>
@@ -224,27 +224,27 @@
   const saveBtn = document.querySelector(".save");
   const showImage = document.querySelector(".show-img");
 
-  // if (window.innerWidth >= 576) {
-  //   signCanvas.setAttribute('width', 466);
-  //   signCanvas.setAttribute('height', 234);
-  //   pen();
-  // } else {
-  //   signCanvas.setAttribute('width', 'auto');
-  //   signCanvas.setAttribute('height', 150);
-  //   pen();
-  // }
+  if (window.innerWidth >= 576) {
+    signCanvas.setAttribute('width', 466);
+    signCanvas.setAttribute('height', 234);
+    pen();
+  } else {
+    signCanvas.setAttribute('width', 300);
+    signCanvas.setAttribute('height', 150);
+    pen();
+  }
 
-  // window.addEventListener("resize", function () {
-  //   if (window.innerWidth >= 576) {
-  //     signCanvas.setAttribute('width', 466);
-  //     signCanvas.setAttribute('height', 234);
-  //     pen();
-  //   } else {
-  //     signCanvas.setAttribute('width', 'auto');
-  //     signCanvas.setAttribute('height', 150);
-  //     pen();
-  //   }
-  // });
+  window.addEventListener("resize", function () {
+    if (window.innerWidth >= 576) {
+      signCanvas.setAttribute('width', 466);
+      signCanvas.setAttribute('height', 234);
+      pen();
+    } else {
+      signCanvas.setAttribute('width', 300);
+      signCanvas.setAttribute('height', 150);
+      pen();
+    }
+  });
 
   // 簽名變換顏色
   const colorBlock = document.querySelectorAll('.colorBlock .stepCircle');
@@ -424,6 +424,96 @@
   }
 
   hasSign();
+</script> -->
+
+<script>
+  const canvas = document.querySelector("#signCanvas");
+  const ctx = canvas.getContext("2d");
+  const clearBtn = document.querySelector(".clear");
+  // const saveBtn = document.querySelector(".save");
+  // const showImage = document.querySelector(".show-img");
+  // console.log(showImage);
+
+  // 設定線條的相關數值
+  ctx.lineWidth = 4;
+  ctx.lineCap = "round";
+
+  // 設置狀態來確認滑鼠 / 手指是否按下或在畫布範圍中
+  let isPainting = false;
+
+  // 取得滑鼠 / 手指在畫布上的位置
+  function getPaintPosition(e) {
+    const canvasSize = canvas.getBoundingClientRect();
+
+    if (e.type === "mousemove") {
+      return {
+        x: e.clientX - canvasSize.left,
+        y: e.clientY - canvasSize.top,
+      };
+    } else {
+      return {
+        x: e.touches[0].clientX - canvasSize.left,
+        y: e.touches[0].clientY - canvasSize.top,
+      };
+    }
+  }
+
+  // 開始繪圖時，將狀態開啟
+  function startPosition(e) {
+    e.preventDefault();
+    isPainting = true;
+  }
+
+  // 結束繪圖時，將狀態關閉，並產生新路徑
+  function finishedPosition() {
+    isPainting = false;
+    ctx.beginPath();
+  }
+
+  // 繪圖過程
+  function draw(e) {
+    // 滑鼠移動過程中，若非繪圖狀態，則跳出
+    if (!isPainting) return;
+
+    // 取得滑鼠 / 手指在畫布上的 x, y 軸位置位置
+    const paintPosition = getPaintPosition(e);
+
+    // 移動滑鼠位置並產生圖案
+    ctx.lineTo(paintPosition.x, paintPosition.y);
+    ctx.stroke();
+  }
+
+  // 重新設定畫布
+  function reset() {
+    localStorage.removeItem("img");
+    // showImage.removeAttribute("src");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // 儲存圖片
+  function saveImage() {
+    // 圖片儲存的類型選擇 png ，並將值放入 img 的 src
+    const newImg = canvas.toDataURL("image/png");
+    // showImage.src = newImg;
+    localStorage.setItem("img", newImg);
+  }
+
+  // event listener 電腦板
+  canvas.addEventListener("mousedown", startPosition);
+  canvas.addEventListener("mouseup", finishedPosition);
+  canvas.addEventListener("mouseleave", finishedPosition);
+  canvas.addEventListener("mousemove", draw);
+
+  // event listener 手機板
+  canvas.addEventListener("touchstart", startPosition);
+  canvas.addEventListener("touchend", finishedPosition);
+  canvas.addEventListener("touchcancel", finishedPosition);
+  canvas.addEventListener("touchmove", draw);
+
+  // 重設按鈕
+  clearBtn.addEventListener("click", reset);
+  // saveBtn.addEventListener("click", saveImage);
+
 </script>
 
     <div class="modal fade messageModal" tabindex="-1">
