@@ -79,7 +79,7 @@
   <div class="d-flex flex-column flex-lg-row gap-3 mb-8">
     <div class="col-lg-8">
       <div class="content w-100 bg-secondary-light d-flex justify-content-center align-items-center">
-        <canvas id="canvas" class="w-100 h-100 object-content"></canvas>
+        <canvas id="pdfCanvas" class="w-100 h-100 object-content"></canvas>
       </div>
       <button type="button"
         class="btn btn-outline-default w-100 py-2d5 d-flex justify-content-center align-items-center fw-bold mb-3 mb-lg-0 resetSignBtn">
@@ -436,23 +436,25 @@
 
 <script>
   // 此處 canvas 套用 fabric.js
-  const canvas = new fabric.Canvas("canvas");
+  const pdfCanvas = new fabric.Canvas("pdfCanvas");
   const content = document.querySelector('.content');
+
+  console.log(pdfCanvas);
 
   document.addEventListener('DOMContentLoaded', async () => {
     const recentPDFDataURL = localStorage.getItem('recentPDF');
 
     if (recentPDFDataURL) {
-      canvas.requestRenderAll();
+      pdfCanvas.requestRenderAll();
       const pdfData = await printPDF(recentPDFDataURL);
       const pdfImage = await pdfToImage(pdfData);
 
       // 透過比例設定 canvas 尺寸
-      canvas.setWidth(pdfImage.width / window.devicePixelRatio);
-      canvas.setHeight(pdfImage.height / window.devicePixelRatio);
+      pdfCanvas.setWidth(pdfImage.width / window.devicePixelRatio);
+      pdfCanvas.setHeight(pdfImage.height / window.devicePixelRatio);
 
       // 將 PDF 畫面設定為背景
-      canvas.setBackgroundImage(pdfImage, canvas.renderAll.bind(canvas));
+      pdfCanvas.setBackgroundImage(pdfImage, pdfCanvas.renderAll.bind(pdfCanvas));
     }
   })
 
@@ -470,13 +472,12 @@
 
     // 設定尺寸及產生 canvas
     const viewport = pdfPage.getViewport({ scale: window.devicePixelRatio });
-    // const canvas = document.querySelector('#pdfCanvas');
-    const pdfCanvas = document.createElement("canvas");
-    const context = pdfCanvas.getContext("2d");
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
 
     // 設定 PDF 所要顯示的寬高及渲染
-    pdfCanvas.height = viewport.height;
-    pdfCanvas.width = viewport.width;
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
     const renderContext = {
       canvasContext: context,
       viewport,
@@ -484,7 +485,7 @@
     const renderTask = pdfPage.render(renderContext);
 
     // 回傳做好的 PDF canvas
-    return renderTask.promise.then(() => pdfCanvas);
+    return renderTask.promise.then(() => canvas);
   }
 
   async function pdfToImage(pdfData) {
@@ -652,25 +653,25 @@
       image.top = 400;
       image.scaleX = 0.5;
       image.scaleY = 0.5;
-      canvas.add(image);
+      pdfCanvas.add(image);
     });
   });
 
   // 刪除 canvas 上選取的簽名
   const resetSignBtn = document.querySelector(".resetSignBtn");
   resetSignBtn.addEventListener("click", () => {
-    canvas.remove(canvas.getActiveObject())
+    pdfCanvas.remove(pdfCanvas.getActiveObject())
   });
 
-  // 下讚PDF
+  // 下載PDF
   const download = document.querySelector(".download");
   download.addEventListener("click", () => {
     const pdf = new jsPDF();
-    const image = canvas.toDataURL("image/png");
+    const image = pdfCanvas.toDataURL("image/png");
 
     // 設定比例
-    let canvasWidth = canvas.width / window.devicePixelRatio;
-    let canvasHeight = canvas.height / window.devicePixelRatio;
+    let canvasWidth = pdfCanvas.width / window.devicePixelRatio;
+    let canvasHeight = pdfCanvas.height / window.devicePixelRatio;
     var ratio = canvasHeight / canvasWidth;
 
     // 設定背景在 PDF 中的位置及大小
