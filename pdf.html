@@ -79,7 +79,7 @@
   <div class="d-flex flex-column flex-lg-row gap-3 mb-8">
     <div class="col-lg-8">
       <div class="content w-100 bg-secondary-light d-flex justify-content-center align-items-center">
-        <canvas id="pdfCanvas" class="w-100 h-100 object-content"></canvas>
+        <canvas id="canvas" class="w-100 h-100 object-content"></canvas>
       </div>
       <button type="button"
         class="btn btn-outline-default w-100 py-2d5 d-flex justify-content-center align-items-center fw-bold mb-3 mb-lg-0 resetSignBtn">
@@ -96,7 +96,7 @@
             <span class="material-icons-outlined">add</span>
             創建簽名檔
           </button>
-          <div class="mySign">
+          <div class="mySign d-none">
             <strong class="">我的簽名</strong>
             <img class="show-img sign w-100 rounded border border-default-light my-2" height="200"
               style="object-fit: content;">
@@ -151,7 +151,7 @@
 <script src="https://unpkg.com/fabric@latest/dist/fabric.js"></script>
 <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js"></script>
-<!-- <script>
+<script>
   // 此處 canvas 套用 fabric.js
   const canvas = new fabric.Canvas("canvas");
   const content = document.querySelector('.content');
@@ -432,14 +432,11 @@
   }
 
   hasSign();
-</script> -->
+</script>
 
-<script>
+<!-- <script>
   // 此處 canvas 套用 fabric.js
   const pdfCanvas = new fabric.Canvas("pdfCanvas");
-  const content = document.querySelector('.content');
-
-  console.log(pdfCanvas);
 
   document.addEventListener('DOMContentLoaded', async () => {
     const recentPDFDataURL = localStorage.getItem('recentPDF');
@@ -717,7 +714,7 @@
 
   hasSign();
 
-</script>
+</script> -->
 
     <div class="modal fade messageModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
