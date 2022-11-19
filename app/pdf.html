@@ -1,0 +1,384 @@
+---
+title: 點點簽 - 加入簽名檔
+layout: ./app/layout.ejs
+engine: ejs
+current: pdf
+---
+
+<section class="bg-default-light border border-bottom">
+  <div class="container">
+    <div class="d-flex justify-content-center">
+      <div class="w-100 w-lg-75 timeline">
+        <ul class="list-unstyled row row-cols-3 g-0 mb-0 py-4">
+          <li class="d-flex justify-content-center align-items-center">
+            <div
+              class="text-white stepCircle bg-default d-flex justify-content-center align-items-center border border-2 border-default rounded-circle">
+              <span class="material-icons-outlined fw-bold fs-7 fs-lg-6">done</span>
+            </div>
+            <p class="ms-2 mx-lg-3 fs-8 fs-lg-6">成功上傳檔案</p>
+          </li>
+          <li class="d-flex justify-content-center align-items-center">
+            <div
+              class="text-white stepCircle active bg-default d-flex justify-content-center align-items-center border border-2 border-default rounded-circle">
+              <span class="fw-bold fs-7 fs-lg-6">2</span>
+            </div>
+            <p class="ms-2 mx-lg-3 fs-8 fs-lg-6">加入簽名檔</p>
+          </li>
+          <li class="d-flex justify-content-center align-items-center">
+            <div
+              class="text-default stepCircle bg-transparent d-flex justify-content-center align-items-center border border-2 border-default rounded-circle">
+              <span class="fw-bold fs-7 fs-lg-6">3</span>
+            </div>
+            <p class="ms-2 mx-lg-3 fs-8 fs-lg-6">下載檔案</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="container">
+  <div class="d-flex flex-column flex-lg-row gap-3 mb-8">
+    <div class="col-lg-8">
+      <div class="content w-100 bg-secondary-light d-flex justify-content-center align-items-center">
+        <canvas id="canvas" class="w-100 h-100 object-content"></canvas>
+      </div>
+      <button type="button"
+        class="btn btn-outline-default w-100 py-2d5 d-flex justify-content-center align-items-center fw-bold resetSignBtn">
+        <span class="material-icons-outlined">delete</span>
+        刪除文件上選取的簽名
+      </button>
+    </div>
+    <div class="col-lg-4">
+      <div class="d-flex flex-column justify-content-between h-100">
+        <div class="pt-lg-4">
+          <button type="button"
+            class="btn btn-default w-100 py-2d5 d-flex justify-content-center align-items-center fw-bold mb-4 addSignBtn"
+            data-bs-toggle="modal" data-bs-target="#signModal">
+            <span class="material-icons-outlined">add</span>
+            創建簽名檔
+          </button>
+          <div class="mySign">
+            <div>
+              <strong class="">我的簽名</strong>
+            </div>
+            <img class="show-img sign w-100 rounded border border-default-light my-2" height="200"
+              style="object-fit: content;">
+            <ul class="fs-7 text-secondary ps-3">
+              <li class="mb-2">點擊我的簽名後，簽名會顯示於 PDF 上，可於 PDF 上移動縮放簽名，請勿重覆點擊。</li>
+              <li class="mb-2">如要清除簽名檔，請選擇編輯簽名檔，按下清除並儲存即可。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="d-flex pt-4">
+          <a href="./index.html" class="btn text-default w-100 py-2d5 me-3">上一步</a>
+          <button type="button" class="download btn btn-default w-100 py-2d5 disabled">下載檔案</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sign Modal -->
+<div class="modal fade" id="signModal" tabindex="-1" aria-labelledby="signModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="signModalLabel">手寫簽名板</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <canvas id="signCanvas" class="border border-dark border-dashed rounded"></canvas>
+        <ul class="list-unstyled d-flex justify-content-end mt-3 colorBlock">
+          <li class="stepCircle active rounded-circle d-flex justify-content-center align-items-center mx-2 bg-dark"
+            data-color="black">
+          </li>
+          <li class="stepCircle rounded-circle d-flex justify-content-center align-items-center mx-2 bg-danger"
+            data-color="red"></li>
+          <li class="stepCircle rounded-circle d-flex justify-content-center align-items-center mx-2 bg-primary"
+            data-color="blue"></li>
+        </ul>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <div class="text-center">
+          <p class="fs-8 text-secondary mb-3">我了解這是一個具法律效力的本人簽名</p>
+          <div class="">
+            <button type="button" class="clear btn btn-outline-default px-5 py-2">清除</button>
+            <button type="button" class="save btn btn-default px-5 py-2" data-bs-dismiss="modal">儲存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/fabric@latest/dist/fabric.js"></script>
+<script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js"></script>
+<script>
+  // 此處 canvas 套用 fabric.js
+  const canvas = new fabric.Canvas("canvas");
+  const content = document.querySelector('.content');
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const recentPDFDataURL = localStorage.getItem('recentPDF');
+
+    if (recentPDFDataURL) {
+      canvas.requestRenderAll();
+      const pdfData = await printPDF(recentPDFDataURL);
+      const pdfImage = await pdfToImage(pdfData);
+
+      // 透過比例設定 canvas 尺寸
+      canvas.setWidth(pdfImage.width / window.devicePixelRatio);
+      canvas.setHeight(pdfImage.height / window.devicePixelRatio);
+
+      // 將 PDF 畫面設定為背景
+      canvas.setBackgroundImage(pdfImage, canvas.renderAll.bind(canvas));
+    }
+  })
+
+  const Base64Prefix = "data:application/pdf;base64,";
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://mozilla.github.io/pdf.js/build/pdf.worker.js";
+
+  async function printPDF(pdfData) {
+    // 將 base64 中的前綴刪去，並進行解碼
+    const data = atob(pdfData.substring(Base64Prefix.length));
+
+    // 利用解碼的檔案，載入 PDF 檔及第一頁
+    const pdfDoc = await pdfjsLib.getDocument({ data }).promise;
+    const pdfPage = await pdfDoc.getPage(1);
+
+    // 設定尺寸及產生 canvas
+    const viewport = pdfPage.getViewport({ scale: window.devicePixelRatio });
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    // 設定 PDF 所要顯示的寬高及渲染
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+    const renderContext = {
+      canvasContext: context,
+      viewport,
+    };
+    const renderTask = pdfPage.render(renderContext);
+
+    // 回傳做好的 PDF canvas
+    return renderTask.promise.then(() => canvas);
+  }
+
+  async function pdfToImage(pdfData) {
+    // 設定 PDF 轉為圖片時的比例
+    const scale = 1 / window.devicePixelRatio;
+
+    // 回傳圖片
+    return new fabric.Image(pdfData, {
+      id: "renderPDF",
+      scaleX: scale,
+      scaleY: scale,
+    });
+  }
+
+  // canvas 大小調整
+  const signCanvas = document.querySelector("#signCanvas");
+  const ctx = signCanvas.getContext("2d");
+  const clearBtn = document.querySelector(".clear");
+  const saveBtn = document.querySelector(".save");
+  const showImage = document.querySelector(".show-img");
+
+  if (window.innerWidth >= 576) {
+    signCanvas.setAttribute('width', 466);
+    signCanvas.setAttribute('height', 234);
+    pen();
+  } else {
+    signCanvas.setAttribute('width', 300);
+    signCanvas.setAttribute('height', 150);
+    pen();
+  }
+
+  window.addEventListener("resize", function () {
+    if (window.innerWidth >= 576) {
+      signCanvas.setAttribute('width', 466);
+      signCanvas.setAttribute('height', 234);
+      pen();
+    } else {
+      signCanvas.setAttribute('width', 300);
+      signCanvas.setAttribute('height', 150);
+      pen();
+    }
+  });
+
+  // 簽名變換顏色
+  const colorBlock = document.querySelectorAll('.colorBlock .stepCircle');
+
+  colorBlock.forEach(item => {
+    item.addEventListener('click', (e) => {
+      const arr = [...e.target.parentNode.children];
+      arr.forEach(item => item.classList.remove('active'));
+      e.target.classList.add('active');
+
+      if (e.target.dataset.color === 'red') {
+        pen('#dc3545');
+      } else if (e.target.dataset.color === 'blue') {
+        pen('#0d6efd');
+      } else if (e.target.dataset.color === 'black') {
+        pen('#000');
+      }
+
+    })
+  })
+
+  // 設定線條的相關數值
+  function pen(color = '#000') {
+    ctx.lineWidth = 4;
+    ctx.lineCap = "round";
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = color;
+  }
+
+  // 設置狀態來確認滑鼠 / 手指是否按下或在畫布範圍中
+  let isPainting = false;
+
+  // 取得滑鼠 / 手指在畫布上的位置
+  function getPaintPosition(e) {
+    const canvasSize = signCanvas.getBoundingClientRect();
+
+    if (e.type === "mousemove") {
+      return {
+        x: e.clientX - canvasSize.left,
+        y: e.clientY - canvasSize.top,
+      };
+    } else {
+      return {
+        x: e.touches[0].clientX - canvasSize.left,
+        y: e.touches[0].clientY - canvasSize.top,
+      };
+    }
+  }
+
+  // 開始繪圖時，將狀態開啟
+  function startPosition(e) {
+    e.preventDefault();
+    isPainting = true;
+  }
+
+  // 結束繪圖時，將狀態關閉，並產生新路徑
+  function finishedPosition() {
+    isPainting = false;
+    ctx.beginPath();
+  }
+
+  // 繪圖過程
+  function draw(e) {
+    // 滑鼠移動過程中，若非繪圖狀態，則跳出
+    if (!isPainting) return;
+
+    // 取得滑鼠 / 手指在畫布上的 x, y 軸位置位置
+    const paintPosition = getPaintPosition(e);
+
+    // 移動滑鼠位置並產生圖案
+    ctx.lineTo(paintPosition.x, paintPosition.y);
+    ctx.stroke();
+  }
+
+  // 重新設定畫布
+  function reset() {
+    localStorage.removeItem("img");
+    showImage.removeAttribute("src");
+    ctx.clearRect(0, 0, signCanvas.width, signCanvas.height);
+  }
+
+  // 儲存圖片
+  function saveImage() {
+    // 圖片儲存的類型選擇 png ，並將值放入 img 的 src
+    const newImg = signCanvas.toDataURL("image/png");
+    showImage.src = newImg;
+    localStorage.setItem("img", newImg);
+    hasSign();
+  }
+
+  // event listener 電腦板
+  signCanvas.addEventListener("mousedown", startPosition);
+  signCanvas.addEventListener("mouseup", finishedPosition);
+  signCanvas.addEventListener("mouseleave", finishedPosition);
+  signCanvas.addEventListener("mousemove", draw);
+
+  // event listener 手機板
+  signCanvas.addEventListener("touchstart", startPosition);
+  signCanvas.addEventListener("touchend", finishedPosition);
+  signCanvas.addEventListener("touchcancel", finishedPosition);
+  signCanvas.addEventListener("touchmove", draw);
+
+  // 重設按鈕
+  clearBtn.addEventListener("click", reset);
+  saveBtn.addEventListener("click", saveImage);
+
+  // 加入簽名
+  const sign = document.querySelector(".sign");
+  // 若 localStorage 有資料才放入
+  if (localStorage.getItem("img")) {
+    sign.src = localStorage.getItem("img");
+  }
+
+  sign.addEventListener("click", () => {
+    if (!sign.src) return;
+    fabric.Image.fromURL(sign.src, function (image) {
+      // 設定簽名出現的位置及大小，後續可調整
+      image.top = 400;
+      image.scaleX = 0.5;
+      image.scaleY = 0.5;
+      canvas.add(image);
+    });
+  });
+
+  // 刪除 canvas 上選取的簽名
+  const resetSignBtn = document.querySelector(".resetSignBtn");
+  resetSignBtn.addEventListener("click", () => {
+    canvas.remove(canvas.getActiveObject())
+  });
+
+  // 下讚PDF
+  const download = document.querySelector(".download");
+  download.addEventListener("click", () => {
+    const pdf = new jsPDF();
+    const image = canvas.toDataURL("image/png");
+
+    // 設定比例
+    let canvasWidth = canvas.width / window.devicePixelRatio;
+    let canvasHeight = canvas.height / window.devicePixelRatio;
+    var ratio = canvasHeight / canvasWidth;
+
+    // 設定背景在 PDF 中的位置及大小
+    let width = pdf.internal.pageSize.getWidth();
+    let height = width * ratio;
+    pdf.addImage(image, "png", 0, 0, width, height);
+
+    // 將檔案取名並下載
+    pdf.save("download.pdf");
+    window.location.href = './finished.html';
+  });
+
+  //判斷有無簽名檔
+  const showImg = document.querySelector('.show-img');
+  const addSignBtn = document.querySelector('.addSignBtn');
+  const mySign = document.querySelector('.mySign');
+  const emptyImg = `data:image/png;base64,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`;
+
+  function hasSign() {
+    if (showImg.getAttribute('src') === '' || !showImg.hasAttribute('src') || showImage.getAttribute('src') === emptyImg) {
+      addSignBtn.innerHTML = `<span class="material-icons-outlined">add</span>創建簽名檔`;
+      addSignBtn.classList.add('btn-default');
+      addSignBtn.classList.remove('btn-outline-default');
+      mySign.classList.add('d-none');
+      download.classList.add('disabled');
+    } else {
+      addSignBtn.innerHTML = `<span class="material-icons-outlined">edit</span>編輯簽名檔`;
+      addSignBtn.classList.remove('btn-default');
+      addSignBtn.classList.add('btn-outline-default');
+      mySign.classList.remove('d-none');
+      download.classList.remove('disabled');
+    }
+  }
+
+  hasSign();
+</script>

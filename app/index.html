@@ -1,0 +1,168 @@
+---
+title: 點點簽
+layout: ./app/layout.ejs
+engine: ejs
+current: index
+---
+
+<div class="container mx-auto pt-4 pb-8 py-lg-6">
+  <section class="mb-5 fileBlock rounded-4">
+    <div class="bg-default-light text-center p-5 py-lg-6 rounded-4">
+      <img src="./assets/images/Add file.svg" alt="add file">
+      <p class="fs-7 fw-light mt-5 mb-2d5">將檔案拖曳至這裡，或</p>
+      <form class="d-flex justify-content-center mb-3 form">
+        <input type="file" accept="application/pdf" id="customFileInput" class="d-none">
+        <label for="customFileInput"
+          class="d-flex justify-content-center align-items-center btn btn-default position-relative w-100 w-lg-35 px-lg-5 py-4">
+          <span class="position-absolute z-1">選擇檔案</span>
+          <progress class="position-absolute border-0 w-100 h-100 bg-transparent z-0" id="progressBar" value="0"
+            max="100"></progress>
+        </label>
+      </form>
+      <strong class="fw-bold fs-7 text-default zone">檔案大小 5MB 以內，檔案格式為 PDF</strong>
+    </div>
+  </section>
+  <section>
+    <div class="container mx-auto text-center">
+      <h2 class="fw-bold fs-4 mb-5">輕鬆幾步驟，完成您的簽署</h2>
+      <ul class="list-unstyled row row-cols-lg-3 g-4">
+        <li class="text-center d-flex flex-column justify-content-center align-items-center">
+          <div
+            class="text-default stepCircle bg-white d-flex justify-content-center align-items-center border border-2 border-default rounded-circle mb-3">
+            <p class="fw-bold">1</p>
+          </div>
+          <b>上傳檔案</b>
+          <p>選擇 PDF 檔或 IMG 檔</p>
+          <img src="./assets/images/human/step1.svg" alt="上傳檔案">
+        </li>
+        <li class="text-center d-flex flex-column justify-content-center align-items-center">
+          <div
+            class="text-default stepCircle bg-white d-flex justify-content-center align-items-center border border-2 border-default rounded-circle mb-3">
+            <p class="fw-bold">2</p>
+          </div>
+          <b>加入簽名檔</b>
+          <p>手寫、輸入簽名檔</p>
+          <img src="./assets/images/human/step2.svg" alt="加入簽名檔">
+        </li>
+        <li class="text-center d-flex flex-column justify-content-center align-items-center">
+          <div
+            class="text-default stepCircle bg-white d-flex justify-content-center align-items-center border border-2 border-default rounded-circle mb-3">
+            <p class="fw-bold">3</p>
+          </div>
+          <b>下載與傳送</b>
+          <p>完成簽署可立即傳送檔案給對方</p>
+          <img src="./assets/images/human/step3.svg" alt="下載與傳送">
+        </li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+  // 點選按鈕上傳
+  const customFileInput = document.querySelector("#customFileInput");
+  customFileInput.addEventListener("change", function (e) {
+    if (customFileInput.files[0].name.split(".")[1] !== "pdf") {
+      messageShow("檔案格式錯誤", "請選擇 PDF 檔案格式！");
+      return;
+    } else {
+      if (customFileInput.files.length > 0) {
+        const reader = new FileReader();
+
+        reader.addEventListener('load', () => {
+          localStorage.setItem('recentPDF', reader.result);
+        })
+        verificationPDFFile(this.files[0])
+        reader.readAsDataURL(this.files[0]);
+      }
+    }
+  });
+
+  // 拖曳檔案上傳
+  const fileBlock = document.querySelector(".fileBlock");
+  let counter = 0;
+
+  fileBlock.addEventListener("dragenter", dragenter, false);
+  fileBlock.addEventListener("dragleave", dragleave, false);
+  fileBlock.addEventListener("dragover", dragover, false);
+  fileBlock.addEventListener("drop", drop, false);
+
+  function preventDefault(e) {
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  function dragenter(e) {
+    preventDefault(e);
+
+    counter++;
+    fileBlock.classList.add('enterZone');
+  };
+
+  function dragleave(e) {
+    preventDefault(e);
+
+    counter--;
+    if (counter === 0) {
+      fileBlock.classList.remove('enterZone');
+    }
+  };
+
+  function dragover(e) {
+    preventDefault(e);
+  };
+
+  function drop(e) {
+    preventDefault(e);
+    dragleave(e);
+
+    const files = e.dataTransfer.files;
+    handleFiles(files);
+  };
+
+  function handleFiles(files) {
+    if (files[0].name.split(".")[1] !== "pdf") {
+      messageShow("檔案格式錯誤", "請選擇 PDF 檔案格式！");
+      return;
+    } else {
+      if (files.length > 0) {
+        let reader = new FileReader();
+
+        reader.addEventListener("load", function () {
+          localStorage.setItem('recentPDF', reader.result);
+        });
+
+        verificationPDFFile(files[0])
+        reader.readAsDataURL(files[0]);
+      }
+    }
+  };
+
+  // progressBar
+  const progressBar = document.querySelector('#progressBar');
+  function progressHandler(e) {
+    var percent = (e.loaded / e.total) * 100;
+    progressBar.value = Math.round(percent);
+
+    if (percent >= 100) {
+      window.location.href = './pdf.html';
+    }
+  }
+
+  // PDF 大小驗證
+  function verificationPDFFile(file) {
+    let fileMaxSize = 5120000;
+    if (file.size > fileMaxSize) {
+      messageShow("請確認您的檔案", "檔案大小不能大於 5MB！");
+      return false;
+    } else {
+      const formData = new FormData();
+      const request = new XMLHttpRequest();
+
+      formData.append("file1", file);
+      request.upload.addEventListener("progress", progressHandler, false);
+      request.open("POST", "https://httpbin.org/post");
+      request.send(formData);
+    }
+  };
+</script>
