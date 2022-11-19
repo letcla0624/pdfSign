@@ -149,10 +149,10 @@
   </div>
 </div>
 
-<!-- <script src="https://unpkg.com/fabric@latest/dist/fabric.js"></script>
+<script src="https://unpkg.com/fabric@latest/dist/fabric.js"></script>
 <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js"></script>
-<script>
+<!-- <script>
   // 此處 canvas 套用 fabric.js
   const canvas = new fabric.Canvas("canvas");
   const content = document.querySelector('.content');
@@ -215,6 +215,12 @@
       scaleY: scale,
     });
   }
+
+
+
+
+
+
 
   // canvas 大小調整
   const signCanvas = document.querySelector("#signCanvas");
@@ -350,6 +356,10 @@
   clearBtn.addEventListener("click", reset);
   saveBtn.addEventListener("click", saveImage);
 
+
+
+
+
   // 加入簽名
   const sign = document.querySelector(".sign");
   // 若 localStorage 有資料才放入
@@ -426,8 +436,12 @@
 </script> -->
 
 <script>
-  const canvas = document.querySelector("#signCanvas");
-  const ctx = canvas.getContext("2d");
+
+
+
+
+  const signCanvas = document.querySelector("#signCanvas");
+  const ctx = signCanvas.getContext("2d");
   const clearBtn = document.querySelector(".clear");
   const saveBtn = document.querySelector(".save");
   const showImage = document.querySelector(".show-img");
@@ -487,7 +501,7 @@
 
   // 取得滑鼠 / 手指在畫布上的位置
   function getPaintPosition(e) {
-    const canvasSize = canvas.getBoundingClientRect();
+    const canvasSize = signCanvas.getBoundingClientRect();
 
     if (e.type === "mousemove") {
       return {
@@ -531,32 +545,86 @@
   function reset() {
     localStorage.removeItem("img");
     showImage.removeAttribute("src");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, signCanvas.width, signCanvas.height);
   }
 
   // 儲存圖片
   function saveImage() {
     // 圖片儲存的類型選擇 png ，並將值放入 img 的 src
-    const newImg = canvas.toDataURL("image/png");
+    const newImg = signCanvas.toDataURL("image/png");
     showImage.src = newImg;
     localStorage.setItem("img", newImg);
+    hasSign();
   }
 
   // event listener 電腦板
-  canvas.addEventListener("mousedown", startPosition);
-  canvas.addEventListener("mouseup", finishedPosition);
-  canvas.addEventListener("mouseleave", finishedPosition);
-  canvas.addEventListener("mousemove", draw);
+  signCanvas.addEventListener("mousedown", startPosition);
+  signCanvas.addEventListener("mouseup", finishedPosition);
+  signCanvas.addEventListener("mouseleave", finishedPosition);
+  signCanvas.addEventListener("mousemove", draw);
 
   // event listener 手機板
-  canvas.addEventListener("touchstart", startPosition);
-  canvas.addEventListener("touchend", finishedPosition);
-  canvas.addEventListener("touchcancel", finishedPosition);
-  canvas.addEventListener("touchmove", draw);
+  signCanvas.addEventListener("touchstart", startPosition);
+  signCanvas.addEventListener("touchend", finishedPosition);
+  signCanvas.addEventListener("touchcancel", finishedPosition);
+  signCanvas.addEventListener("touchmove", draw);
 
   // 重設按鈕
   clearBtn.addEventListener("click", reset);
   saveBtn.addEventListener("click", saveImage);
+
+
+
+
+
+  // // 加入簽名
+  // const sign = document.querySelector(".sign");
+  // // 若 localStorage 有資料才放入
+  // if (localStorage.getItem("img")) {
+  //   sign.src = localStorage.getItem("img");
+  // }
+
+  // sign.addEventListener("click", () => {
+  //   if (!sign.src) return;
+  //   fabric.Image.fromURL(sign.src, function (image) {
+  //     // 設定簽名出現的位置及大小，後續可調整
+  //     image.top = 400;
+  //     image.scaleX = 0.5;
+  //     image.scaleY = 0.5;
+  //     canvas.add(image);
+  //   });
+  // });
+
+  // // 刪除 canvas 上選取的簽名
+  // const resetSignBtn = document.querySelector(".resetSignBtn");
+  // resetSignBtn.addEventListener("click", () => {
+  //   canvas.remove(canvas.getActiveObject())
+  // });
+
+  // // 下讚PDF
+  // const download = document.querySelector(".download");
+  // download.addEventListener("click", () => {
+  //   const pdf = new jsPDF();
+  //   const image = canvas.toDataURL("image/png");
+
+  //   // 設定比例
+  //   let canvasWidth = canvas.width / window.devicePixelRatio;
+  //   let canvasHeight = canvas.height / window.devicePixelRatio;
+  //   var ratio = canvasHeight / canvasWidth;
+
+  //   // 設定背景在 PDF 中的位置及大小
+  //   let width = pdf.internal.pageSize.getWidth();
+  //   let height = width * ratio;
+  //   pdf.addImage(image, "png", 0, 0, width, height);
+
+  //   // 將檔案取名並下載
+  //   pdf.save("download.pdf");
+  //   window.location.href = './finished.html';
+  // });
+
+
+
+
 
   //判斷有無簽名檔
   const showImg = document.querySelector('.show-img');
@@ -571,14 +639,14 @@
       addSignBtn.innerHTML = `<span class="material-icons-outlined">add</span>創建簽名檔`;
       addSignBtn.classList.add('btn-default');
       addSignBtn.classList.remove('btn-outline-default');
-      // mySign.classList.add('d-none');
+      mySign.classList.add('d-none');
       // download.classList.add('disabled');
       // resetSignBtn.classList.add('disabled');
     } else {
       addSignBtn.innerHTML = `<span class="material-icons-outlined">edit</span>編輯簽名檔`;
       addSignBtn.classList.remove('btn-default');
       addSignBtn.classList.add('btn-outline-default');
-      // mySign.classList.remove('d-none');
+      mySign.classList.remove('d-none');
       // download.classList.remove('disabled');
       // resetSignBtn.classList.remove('disabled');
     }
