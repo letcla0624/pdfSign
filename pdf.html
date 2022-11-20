@@ -177,8 +177,6 @@
     }
   })
 
-
-
   async function printPDF(pdfData) {
     // 將 base64 中的前綴刪去，並進行解碼
     const data = atob(pdfData.substring(Base64Prefix.length));
@@ -216,6 +214,51 @@
       scaleY: scale,
     });
   }
+
+  // 加入簽名
+  const sign = document.querySelector(".sign");
+  // 若 localStorage 有資料才放入
+  if (localStorage.getItem("img")) {
+    sign.src = localStorage.getItem("img");
+  }
+
+  sign.addEventListener("click", () => {
+    if (!sign.src) return;
+    fabric.Image.fromURL(sign.src, function (image) {
+      // 設定簽名出現的位置及大小，後續可調整
+      image.top = 400;
+      image.scaleX = 0.5;
+      image.scaleY = 0.5;
+      canvas.add(image);
+    });
+  });
+
+  // 刪除 canvas 上選取的簽名
+  const resetSignBtn = document.querySelector(".resetSignBtn");
+  resetSignBtn.addEventListener("click", () => {
+    canvas.remove(canvas.getActiveObject())
+  });
+
+  // 下讚PDF
+  const download = document.querySelector(".download");
+  download.addEventListener("click", () => {
+    const pdf = new jsPDF();
+    const image = canvas.toDataURL("image/png");
+
+    // 設定比例
+    let canvasWidth = canvas.width / window.devicePixelRatio;
+    let canvasHeight = canvas.height / window.devicePixelRatio;
+    var ratio = canvasHeight / canvasWidth;
+
+    // 設定背景在 PDF 中的位置及大小
+    let width = pdf.internal.pageSize.getWidth();
+    let height = width * ratio;
+    pdf.addImage(image, "png", 0, 0, width, height);
+
+    // 將檔案取名並下載
+    pdf.save("download.pdf");
+    window.location.href = './finished.html';
+  });
 
   // canvas 大小調整
   const signCanvas = document.querySelector("#signCanvas");
@@ -349,51 +392,6 @@
   // 重設按鈕
   clearBtn.addEventListener("click", reset);
   saveBtn.addEventListener("click", saveImage);
-
-  // 加入簽名
-  const sign = document.querySelector(".sign");
-  // 若 localStorage 有資料才放入
-  if (localStorage.getItem("img")) {
-    sign.src = localStorage.getItem("img");
-  }
-
-  sign.addEventListener("click", () => {
-    if (!sign.src) return;
-    fabric.Image.fromURL(sign.src, function (image) {
-      // 設定簽名出現的位置及大小，後續可調整
-      image.top = 400;
-      image.scaleX = 0.5;
-      image.scaleY = 0.5;
-      canvas.add(image);
-    });
-  });
-
-  // 刪除 canvas 上選取的簽名
-  const resetSignBtn = document.querySelector(".resetSignBtn");
-  resetSignBtn.addEventListener("click", () => {
-    canvas.remove(canvas.getActiveObject())
-  });
-
-  // 下讚PDF
-  const download = document.querySelector(".download");
-  download.addEventListener("click", () => {
-    const pdf = new jsPDF();
-    const image = canvas.toDataURL("image/png");
-
-    // 設定比例
-    let canvasWidth = canvas.width / window.devicePixelRatio;
-    let canvasHeight = canvas.height / window.devicePixelRatio;
-    var ratio = canvasHeight / canvasWidth;
-
-    // 設定背景在 PDF 中的位置及大小
-    let width = pdf.internal.pageSize.getWidth();
-    let height = width * ratio;
-    pdf.addImage(image, "png", 0, 0, width, height);
-
-    // 將檔案取名並下載
-    pdf.save("download.pdf");
-    window.location.href = './finished.html';
-  });
 
   //判斷有無簽名檔
   const showImg = document.querySelector('.show-img');
